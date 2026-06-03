@@ -19,6 +19,8 @@
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
         input { width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 16px; transition: border 0.2s; }
         input:focus { outline: none; border-color: var(--primary); }
+        .row { display: flex; gap: 15px; }
+        .row .form-group { flex: 1; }
         button { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
         button:hover { background: #142b16; }
         .success-msg { display: none; text-align: center; padding: 20px 0; }
@@ -49,10 +51,19 @@
                 <label for="phone">Phone Number *</label>
                 <input type="tel" id="phone" required autocomplete="tel">
             </div>
-            <div class="form-group">
-                <label for="startTime">Tee Time / Start Time *</label>
-                <input type="time" id="startTime" required>
+            
+            <!-- Date and 24h Time Fields side by side -->
+            <div class="row">
+                <div class="form-group">
+                    <label for="playDate">Date of Play *</label>
+                    <input type="date" id="playDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="startTime">Start Time (24h) *</label>
+                    <input type="time" id="startTime" required>
+                </div>
             </div>
+            
             <button type="submit">Confirm Arrival & Play</button>
         </form>
     </div>
@@ -64,26 +75,34 @@
 </div>
 
 <script>
-    // Automatically set the time field to the player's current local time
+    // Get current local date and time
     const now = new Date();
-    const timeField = document.getElementById('startTime');
-    timeField.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    // Format and set current date (YYYY-MM-DD)
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    document.getElementById('playDate').value = `${year}-${month}-${day}`;
+
+    // Format and set current time explicitly to 24-hour format (HH:MM)
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('startTime').value = `${hours}:${minutes}`;
 
     function handleCheckin(event) {
         event.preventDefault();
         
-        // Collect form data to send to your backend/email webhook later
         const data = {
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
             email: document.getElementById('email').value,
             phone: document.getElementById('phone').value,
+            playDate: document.getElementById('playDate').value,
             startTime: document.getElementById('startTime').value
         };
 
-        console.log("Player checked in:", data);
+        console.log("Player checked in successfully:", data);
 
-        // Hide form, show success screen
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('success-container').style.display = 'block';
     }
